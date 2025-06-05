@@ -43,7 +43,7 @@ interface NewsResponse {
 // Updated client-side function
 export const fetchNewsForLocation = async (location: string): Promise<NewsArticle[]> => {
   try {
-    const WORKER_URL = "https://vaibhavvs2004.workers.dev"; // Your Worker URL
+    const WORKER_URL = "https://small-cloud-f632.vaibhavvs2004.workers.dev"; // Your Worker URL
     const response = await axios.get(`${WORKER_URL}?location=${location}`);
     
     if (response.data.status !== 'ok') {
