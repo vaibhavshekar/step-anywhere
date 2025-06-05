@@ -3,6 +3,11 @@ import axios from 'axios';
 const NEWS_API_KEY = '092c3e4c0b414b9597c07d6eb3318fa1';
 const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
 
+// Ensure we're using HTTPS
+if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+  console.warn('News API requires HTTPS. Please ensure your site is served over HTTPS.');
+}
+
 interface NewsArticle {
   source: {
     id: string | null;
