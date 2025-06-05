@@ -40,50 +40,19 @@ interface NewsResponse {
   articles: NewsArticle[];
 }
 
+// Updated client-side function
 export const fetchNewsForLocation = async (location: string): Promise<NewsArticle[]> => {
   try {
-    if (!NEWS_API_KEY) {
-      console.error('News API key is not configured');
-      throw new Error('News API key is not configured');
-    }
-
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const WORKER_URL = "https://vaibhavvs2004.workers.dev"; // Your Worker URL
+    const response = await axios.get(`${WORKER_URL}?location=${location}`);
     
-    console.log('Fetching news for:', location);
-    
-    const response = await newsApiClient.get<NewsResponse>('/everything', {
-      params: {
-        q: location,
-        from: oneWeekAgo.toISOString(),
-        sortBy: 'publishedAt',
-        language: 'en'
-      }
-    });
-
-    console.log('News API Response:', {
-      status: response.data.status,
-      totalResults: response.data.totalResults,
-      articlesCount: response.data.articles.length
-    });
-
     if (response.data.status !== 'ok') {
-      throw new Error(`News API returned status: ${response.data.status}`);
+      throw new Error(`News API error: ${response.data.message}`);
     }
-
     return response.data.articles;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('News API Error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config
-      });
-    } else {
-      console.error('Error fetching news:', error);
-    }
-    throw error;
+    console.error("Proxy fetch error:", error);
+    return []; // Return empty array on error
   }
 };
 
