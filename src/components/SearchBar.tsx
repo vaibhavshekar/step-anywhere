@@ -14,6 +14,8 @@ import {
 } from '@/services/amadeusApi';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from '../context/AuthContext';
+import LoginDialog from './LoginDialog';
 
 interface FlightFilter {
   sortBy: 'price' | 'duration' | 'departure';
@@ -276,7 +278,13 @@ const FlightCard = ({
 const SearchBar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("flights");
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState<{
+    type: 'flight' | 'hotel';
+    details: any;
+  } | null>(null);
 
   // Form states
   const [departureCity, setDepartureCity] = useState('');
@@ -416,15 +424,63 @@ const SearchBar = () => {
   };
 
   const handleBookNow = (provider: string, price: number, result: SearchResult) => {
-    if (result.hotel?.website) {
-      window.open(result.hotel.website, '_blank');
+    if (!user) {
+      setPendingBooking({
+        type: activeTab === 'flights' ? 'flight' : 'hotel',
+        details: activeTab === 'flights' ? {
+          from: departureCity,
+          to: destinationCity,
+          date: departureDate,
+          flightNumber: result.flightNumber
+        } : {
+          hotelName: result.hotel?.name,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          roomType: 'Standard',
+          guests: guests
+        }
+      });
+      setIsLoginOpen(true);
+      return;
     }
 
-    toast({
-      title: "Redirecting to provider",
-      description: `Taking you to ${provider} to complete your booking for $${price}.`,
-    });
+    if (activeTab === 'flights') {
+      navigate('/flights', { 
+        state: { 
+          flightDetails: {
+            from: departureCity,
+            to: destinationCity,
+            date: departureDate,
+            flightNumber: result.flightNumber
+          }
+        }
+      });
+    } else {
+      navigate('/hotels', {
+        state: {
+          hotelDetails: {
+            hotelName: result.hotel?.name,
+            checkIn: checkInDate,
+            checkOut: checkOutDate,
+            roomType: 'Standard',
+            guests: guests
+          }
+        }
+      });
+    }
     setShowResults(false);
+  };
+
+  const handleLoginSuccess = () => {
+    if (pendingBooking) {
+      if (pendingBooking.type === 'flight') {
+        navigate('/flights', { state: { flightDetails: pendingBooking.details } });
+      } else {
+        navigate('/hotels', { state: { hotelDetails: pendingBooking.details } });
+      }
+      setPendingBooking(null);
+      setShowResults(false);
+    }
   };
 
   const handleCloseResults = () => {
@@ -703,6 +759,15 @@ const SearchBar = () => {
           </p>
         </DialogContent>
       </Dialog>
+
+      <LoginDialog 
+        isOpen={isLoginOpen} 
+        onClose={() => {
+          setIsLoginOpen(false);
+          setPendingBooking(null);
+        }}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 };
