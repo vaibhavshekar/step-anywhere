@@ -43,16 +43,20 @@ interface NewsResponse {
 // Updated client-side function
 export const fetchNewsForLocation = async (location: string): Promise<NewsArticle[]> => {
   try {
-    const WORKER_URL = "https://small-cloud-f632.vaibhavvs2004.workers.dev"; // Your Worker URL
-    const response = await axios.get(`${WORKER_URL}?location=${location}`);
+    const WORKER_URL = "https://small-cloud-f632.vaibhavvs2004.workers.dev";
+    const response = await axios.get(`${WORKER_URL}`, {
+      params: { location },
+      timeout: 10000 // 10 second timeout
+    });
     
     if (response.data.status !== 'ok') {
-      throw new Error(`News API error: ${response.data.message}`);
+      console.warn('News API non-ok status:', response.data.status);
+      return [];
     }
-    return response.data.articles;
+    return response.data.articles || [];
   } catch (error) {
     console.error("Proxy fetch error:", error);
-    return []; // Return empty array on error
+    return []; // Fail gracefully
   }
 };
 
