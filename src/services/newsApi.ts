@@ -3,6 +3,18 @@ import axios from 'axios';
 const NEWS_API_KEY = '092c3e4c0b414b9597c07d6eb3318fa1';
 const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
 
+// Create axios instance with default config
+const newsApiClient = axios.create({
+  baseURL: NEWS_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Origin': typeof window !== 'undefined' ? window.location.origin : '',
+    'X-Api-Key': NEWS_API_KEY
+  }
+});
+
 // Ensure we're using HTTPS
 if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
   console.warn('News API requires HTTPS. Please ensure your site is served over HTTPS.');
@@ -39,15 +51,13 @@ export const fetchNewsForLocation = async (location: string): Promise<NewsArticl
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     
     console.log('Fetching news for:', location);
-    console.log('API Key:', NEWS_API_KEY ? 'Present' : 'Missing');
     
-    const response = await axios.get<NewsResponse>(`${NEWS_API_BASE_URL}/everything`, {
+    const response = await newsApiClient.get<NewsResponse>('/everything', {
       params: {
         q: location,
         from: oneWeekAgo.toISOString(),
         sortBy: 'publishedAt',
-        language: 'en',
-        apiKey: NEWS_API_KEY
+        language: 'en'
       }
     });
 
@@ -67,7 +77,8 @@ export const fetchNewsForLocation = async (location: string): Promise<NewsArticl
       console.error('News API Error:', {
         message: error.message,
         response: error.response?.data,
-        status: error.response?.status
+        status: error.response?.status,
+        config: error.config
       });
     } else {
       console.error('Error fetching news:', error);
