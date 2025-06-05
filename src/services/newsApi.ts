@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+const NEWS_API_KEY = '092c3e4c0b414b9597c07d6eb3318fa1';
 const NEWS_API_BASE_URL = 'https://newsapi.org/v2';
 
 interface NewsArticle {
