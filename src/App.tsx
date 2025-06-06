@@ -12,46 +12,58 @@ import DestinationsList from "./pages/DestinationsList";
 import NotFound from "./pages/NotFound";
 import FlightBooking from "./pages/FlightBooking";
 import HotelBooking from "./pages/HotelBooking";
+import ApiRestrictionPopup from "./components/ApiRestrictionPopup";
+import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/destinations" element={<DestinationsList />} />
-              <Route path="/destination/:id" element={<DestinationDetail />} />
-              <Route
-                path="/flights"
-                element={
-                  <ProtectedRoute>
-                    <FlightBooking />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/hotels"
-                element={
-                  <ProtectedRoute>
-                    <HotelBooking />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/safety-guide" element={<NotFound />} />
-              <Route path="/badges" element={<NotFound />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    // Show popup on initial load
+    setShowPopup(true);
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <ApiRestrictionPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/destinations" element={<DestinationsList />} />
+                <Route path="/destination/:id" element={<DestinationDetail />} />
+                <Route
+                  path="/flights"
+                  element={
+                    <ProtectedRoute>
+                      <FlightBooking />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/hotels"
+                  element={
+                    <ProtectedRoute>
+                      <HotelBooking />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/safety-guide" element={<NotFound />} />
+                <Route path="/badges" element={<NotFound />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
