@@ -1,5 +1,5 @@
-const AMADEUS_API_KEY = 'xNb1OTjIK17JNZNdMMWCTkDHTquop50O';
-const AMADEUS_CLIENT_SECRET = 'RX5jCftISZiXPlh6';
+const AMADEUS_API_KEY = 'Jwsp4rCR17lj7G2iG09t722A74BnmHAG';
+const AMADEUS_CLIENT_SECRET = 'W6xZXClfJI9gQOR7';
 const AMADEUS_BASE_URL_HOTELS = 'https://test.api.amadeus.com';
 const AMADEUS_BASE_URL_FLIGHTS = 'https://test.api.amadeus.com/v2';
 
